@@ -1,0 +1,4 @@
+['(',n(a),or,b,')',and,'(',c,or,d,')',and,'(',n(d),or,b,')',and,'(',n(b),')',and,'(',n(c),or,b,')',and,'(',e,')',and,'(',f,or,a,or,b,or,n(f),')']
+['(',n(b),or,a,')',and,'(',n(a),or,b,or,e,')',and,'(',a,or,n(e),')',and,'(',n(a),or,e,')']
+['(',n(a),or,b,')',and,'(',c,or,f,')',and,'(',n(c),')',and,'(',n(f),or,b,')',and,'(',n(c),or,b,')']
+['(',a,or,b,')',and,'(',n(a),or,n(b),')',and,'(', c, ')']
