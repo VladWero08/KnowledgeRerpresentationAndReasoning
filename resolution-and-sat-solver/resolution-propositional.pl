@@ -112,7 +112,7 @@ resolution_on_list([KB|KBs]) :-
     resolution(KB), nl, nl,
     resolution_on_list(KBs).
 
-/* Applies resolution to all KBs from.*/
+/* Applies resolution to all KBs from a file.*/
 solve :-
     read_file("./inputs/resolution-propositional.txt", KBs),
     process_sentences(KBs, KBParsed),

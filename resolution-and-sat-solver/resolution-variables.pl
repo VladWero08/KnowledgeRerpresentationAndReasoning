@@ -1,3 +1,5 @@
+:- ["./read.pl", "./parse.pl"].
+
 /* Negation of a predicate. */
 neg(n(X), X) :- !.
 neg(X, n(X)).
@@ -117,8 +119,9 @@ search_clauses([_|KB], KBOriginal, Resoluted, Clause, Matching, Resolvent) :-
 resolution_helper(KB, _) :- 
     member([], KB), write("UNSATISFIABLE"), !.
 resolution_helper(KB, Resoluted) :-
-    write(KB),
-    search_clauses(KB, KB, Resoluted, Clause, Matching, Resolvent),
+    copy_term(KB, KBCopy),
+    remove_tautologies(KBCopy, KBOpt),
+    search_clauses(KBOpt, KBOpt, Resoluted, Clause, Matching, Resolvent),
     Clause \= [], Matching \= [],
     resolution_helper([Resolvent|KB], [[Clause, Matching]|Resoluted]), !.
 resolution_helper(_, _) :- write("SATISFIABLE").
@@ -127,9 +130,24 @@ resolution_helper(_, _) :- write("SATISFIABLE").
  * */
 resolution(KB) :- replace_vars_from_clause(KB, KBNew), resolution_helper(KBNew, []).
 
+/* Given a list of KBs, apply the resolution
+ * algorithm on every single KB.
+ * */
+resolution_on_list([]).
+resolution_on_list([KB|KBs]) :-
+    write("Resolution for:"), nl,
+    write(KB), nl, 
+    resolution(KB), nl, nl,
+    resolution_on_list(KBs). 
 
-% Project 1:
-% 1. c)
-% 
-% -> C3 pg.29) resolution([[n(hardWorker(sue)], [n(student(X), hardWorker(X)], [n(gradStudent(X)), student(X)], [gradStudent(sue)]]).
-% -> C3 pg.30) resolution([[on(a, b)], [on(b, c)], [green(a)], [n(green(c))], [n(green(X)), green(Y), n(on(X, Y))]]).
+/* Applies resolution to all KBs from a file. */
+solve :-
+    read_file("./inputs/resolution-variables.txt", KBs),
+    process_sentences(KBs, KBParsed),
+    resolution_on_list(KBParsed).
+
+/* Applies resolution to the football knowledge base. */
+solve_football :-
+    read_file("./inputs/football.txt", KBs),
+    process_sentences(KBs, KBParsed),
+    resolution_on_list(KBParsed).
