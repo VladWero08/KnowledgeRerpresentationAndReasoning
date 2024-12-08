@@ -1,14 +1,12 @@
-% :- use_module(parse, [process_sentece/2]).
-
 /* Given a sentence as a list of parentheses, predicates
  * and variables, parse the sentence using a grammar and translate
  * it to a Prolog list.
  * */
-process_sentece(Sentece, Result) :- translate(Result, Sentece, []).
+process_sentence(Sentece, Result) :- translate(Result, Sentece, []).
 
 process_sentences([], []).
 process_sentences([Sentece|Sentences], [Result|Results]) :-
-    process_sentece(Sentece, Result),
+    process_sentence(Sentece, Result),
     process_sentences(Sentences, Results).
 
 % match all conjunctions

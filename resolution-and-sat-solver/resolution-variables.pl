@@ -1,32 +1,4 @@
-:- ["./read.pl", "./parse.pl"].
-
-/* Negation of a predicate. */
-neg(n(X), X) :- !.
-neg(X, n(X)).
-
-/* Check whether the given list is member of a 
- * list of lists, not taking into consideration 
- * the order of the predicates.
- * */
-is_member(_, []) :- !, false.
-is_member(X, [H|_]) :-
-    permutation(X, H), !.
-is_member(X, [_|T]) :-
-    is_member(X, T).
-
-is_not_member(X, List) :- \+ is_member(X, List).
-
-/* Given an element and a list, eliminates the first appearence
- * of the element from the list.
- * */
-eliminate(Target, [Target|T], T).
-eliminate(Target, [H|T], [H|Result]) :- eliminate(Target, T, Result).
-
-/* Given two lists, merges them and removes any duplicates.
- * */
-merge([], L, L).
-merge([H|T], L, Result) :- member(H, L), !, merge(T, L, Result).
-merge([H|T], L, [H|Result]) :- merge(T, L, Result).
+:- ["./utils/read.pl", "./utils/parse.pl", "./utils/utils.pl"].
 
 /* Given a clause, a list with multiple terms, extract
  * all the variables from the clause.
@@ -54,8 +26,7 @@ is_tautology([]) :- false.
 is_tautology([H|T]) :- neg(H, Hneg), member(Hneg, T), !.
 is_tautology([_|T]) :- is_tautology(T).
 
-/* 
- * Given a knowledge base, removes every tautology from it.
+/* Given a knowledge base, removes every tautology from it.
  * */
 remove_tautologies([], []).
 remove_tautologies([Clause|KB], KBNew) :- is_tautology(Clause), remove_tautologies(KB, KBNew).
@@ -116,19 +87,20 @@ search_clauses([_|KB], KBOriginal, Resoluted, Clause, Matching, Resolvent) :-
  * denoted as n(X), applies the resolution algorithm to see 
  * if the predicates are unsatisfiable or satisfiable.
  * */
-resolution_helper(KB, _) :- 
-    member([], KB), write("UNSATISFIABLE"), !.
-resolution_helper(KB, Resoluted) :-
+resolution_helper(KB, _, Result) :- 
+    member([], KB), Result = "UNSATISFIABLE", write(Result), nl, !.
+resolution_helper(KB, Resoluted, Result) :-
     copy_term(KB, KBCopy),
     remove_tautologies(KBCopy, KBOpt),
     search_clauses(KBOpt, KBOpt, Resoluted, Clause, Matching, Resolvent),
     Clause \= [], Matching \= [],
-    resolution_helper([Resolvent|KB], [[Clause, Matching]|Resoluted]), !.
-resolution_helper(_, _) :- write("SATISFIABLE").
+    resolution_helper([Resolvent|KB], [[Clause, Matching]|Resoluted], Result), !.
+resolution_helper(_, _, Result) :- 
+    Result = "SATISFIABLE", write(Result), nl.
 
 /* Given a KB, replaces all of its variables and runs the resolution algorithm.
  * */
-resolution(KB) :- replace_vars_from_clause(KB, KBNew), resolution_helper(KBNew, []).
+resolution(KB, Result) :- replace_vars_from_clause(KB, KBNew), resolution_helper(KBNew, [], Result).
 
 /* Given a list of KBs, apply the resolution
  * algorithm on every single KB.
@@ -137,7 +109,7 @@ resolution_on_list([]).
 resolution_on_list([KB|KBs]) :-
     write("Resolution for:"), nl,
     write(KB), nl, 
-    resolution(KB), nl, nl,
+    resolution(KB, _), nl, nl,
     resolution_on_list(KBs). 
 
 /* Applies resolution to all KBs from a file. */
@@ -149,5 +121,7 @@ solve :-
 /* Applies resolution to the football knowledge base. */
 solve_football :-
     read_file("./inputs/football.txt", KBs),
-    process_sentences(KBs, KBParsed),
-    resolution_on_list(KBParsed).
+    unpack_kb(KBs, KB),
+    process_sentence(KB, KBParsed),
+    write(KBParsed), nl,
+    resolution(KBParsed, _).
