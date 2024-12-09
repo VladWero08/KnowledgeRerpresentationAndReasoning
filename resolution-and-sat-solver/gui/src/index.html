@@ -181,10 +181,12 @@
                         alert("NO!... Your question is NOT entailed from the knowledge base.");
                     }
 
-                    // go to the default values after finalisation of the request
+                    // reset to the default values after finalisation of the request
                     document.getElementById("player").selectedIndex = 0; 
                     document.getElementById("position").selectedIndex = -1; 
                     document.getElementById("ability").selectedIndex = -1; 
+                    // reset the question to default
+                    document.getElementById("question").textContent = "";
                 })   
                .catch(error => {
                     alert("Error while resolving your question. Try again.");

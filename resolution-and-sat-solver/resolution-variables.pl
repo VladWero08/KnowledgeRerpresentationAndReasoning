@@ -19,19 +19,6 @@ replace_vars_from_clause([Clause|KB], [NewClause|NewKB]) :-
     copy_term(Variables, Clause, _, NewClause),
     replace_vars_from_clause(KB, NewKB).
 
-/* Given a clause, returns whether the clause 
- * is a tautology or not.
- * */
-is_tautology([]) :- false.
-is_tautology([H|T]) :- neg(H, Hneg), member(Hneg, T), !.
-is_tautology([_|T]) :- is_tautology(T).
-
-/* Given a knowledge base, removes every tautology from it.
- * */
-remove_tautologies([], []).
-remove_tautologies([Clause|KB], KBNew) :- is_tautology(Clause), remove_tautologies(KB, KBNew).
-remove_tautologies([Clause|KB], [Clause|KBNew]) :- remove_tautologies(KB, KBNew).
-
 /* Given two clauses and a literal, removes the literal
  * from the first clause and the negated literal from
  * the second clause, then concatenates the results.

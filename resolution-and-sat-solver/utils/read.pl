@@ -1,5 +1,3 @@
-% :- use_module(reads, [read_file/2, line_to_atom/2, read_lines/2]).
-
 /* Reads the content of a given file, line by line.
  * */
 read_file(Filename, Lines) :-
