@@ -90,9 +90,7 @@ search_clauses([_|KB], KBOriginal, Resoluted, Clause, Matching, Resolvent) :-
 resolution_helper(KB, _, Result) :- 
     member([], KB), Result = "UNSATISFIABLE", write(Result), nl, !.
 resolution_helper(KB, Resoluted, Result) :-
-    copy_term(KB, KBCopy),
-    remove_tautologies(KBCopy, KBOpt),
-    search_clauses(KBOpt, KBOpt, Resoluted, Clause, Matching, Resolvent),
+    search_clauses(KB, KB, Resoluted, Clause, Matching, Resolvent),
     Clause \= [], Matching \= [],
     resolution_helper([Resolvent|KB], [[Clause, Matching]|Resoluted], Result), !.
 resolution_helper(_, _, Result) :- 
