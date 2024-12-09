@@ -17,31 +17,21 @@
  * -> literal that appears in the shortest clause 
  * */
 
- :- ["./read.pl", "./parse.pl"].
-
-/* Negation of a literal */
-neg(n(X), X) :- !.
-neg(X, n(X)).
-
- /* Given an element and a list, eliminates the first appearence
-  * of the element from the list.
-  * */
-eliminate(Target, [Target|T], T).
-eliminate(Target, [H|T], [H|Result]) :- eliminate(Target, T, Result).
+ :- ["./utils/read.pl", "./utils/parse.pl", "./utils/utils.pl"].
 
 /* Given a literal from the KB, eliminate all the clauses that
  * contain the literal, and remove the negation of the literal
  * from the other clauses.
  * */
-eliminate_literal([], _, []).
-eliminate_literal([C|KB], Literal, KBNew) :- 
+eliminate_clauses_with_literal([], _, []).
+eliminate_clauses_with_literal([C|KB], Literal, KBNew) :- 
     member(Literal, C), 
-    eliminate_literal(KB, Literal, KBNew), !.
-eliminate_literal([C|KB], Literal, [CNew|KBNew]) :- 
+    eliminate_clauses_with_literal(KB, Literal, KBNew), !.
+eliminate_clauses_with_literal([C|KB], Literal, [CNew|KBNew]) :- 
     neg(Literal, NegLiteral), member(NegLiteral, C), eliminate(NegLiteral, C, CNew), 
-    eliminate_literal(KB, Literal, KBNew), !.
-eliminate_literal([C|KB], Literal, [C|KBNew]) :- 
-    eliminate_literal(KB, Literal, KBNew).
+    eliminate_clauses_with_literal(KB, Literal, KBNew), !.
+eliminate_clauses_with_literal([C|KB], Literal, [C|KBNew]) :- 
+    eliminate_clauses_with_literal(KB, Literal, KBNew).
 
 /* Given a literal and a clause, returns in the third variable whether 
  * the literal is part of the clause or not. 
@@ -69,8 +59,8 @@ extract_truth_literal(X, [X, true]).
 extract_literals_from_KB(KB, Literals) :- append(KB, KBLiterals), list_to_set(KBLiterals, Literals). 
 
 /* Given a clause, extracts the first literal from it */
-extractFirstLiteralFromClause([], _).
-extractFirstLiteralFromClause([Literal|_], Literal).
+extract_first_literal_from_clause([], _).
+extract_first_literal_from_clause([Literal|_], Literal).
 
 /* Given a KB and literals, extract the literal with the most of occurences. */
 choose_most_frequent_literal_helper(_, [], [_, 0]).
@@ -95,7 +85,7 @@ choose_shortest_clause([_|KB], [MinLiteral, MinClauseLength]) :-
 	choose_shortest_clause(KB, [MinLiteral, MinClauseLength]).  
 
 /* Given a KB, extracts the first literal from the shortest clause */
-chooseLiteralFromShortestClause(KB, Literal) :- choose_shortest_clause(KB, [Clause, _]), extractFirstLiteralFromClause(Clause, Literal).
+choose_literal_from_shortest_clause(KB, Literal) :- choose_shortest_clause(KB, [Clause, _]), extract_first_literal_from_clause(Clause, Literal).
 
 /* Given a KB, runs the David-Putnam SAT Solver algorithm. 
  * It returns the S solution if the algorithm succeeds.
@@ -103,12 +93,12 @@ chooseLiteralFromShortestClause(KB, Literal) :- choose_shortest_clause(KB, [Clau
 davis_putnam([], []).
 davis_putnam(KB, _) :- member([], KB), !, fail.
 davis_putnam(KB, [LiteralSol|S]) :- 
-    choose_most_frequent_literal(KB, Literal), 
-    extract_truth_literal(Literal, LiteralSol), eliminate_literal(KB, Literal, KBNew), 
+    choose_literal_from_shortest_clause(KB, Literal), 
+    extract_truth_literal(Literal, LiteralSol), eliminate_clauses_with_literal(KB, Literal, KBNew), 
     davis_putnam(KBNew, S), !.
 davis_putnam(KB, [LiteralSol|S]) :- 
-    choose_most_frequent_literal(KB, Literal), neg(Literal, NegLiteral), 
-    extract_truth_literal(NegLiteral, LiteralSol), eliminate_literal(KB, NegLiteral, KBNew), 
+    choose_literal_from_shortest_clause(KB, Literal), neg(Literal, NegLiteral), 
+    extract_truth_literal(NegLiteral, LiteralSol), eliminate_clauses_with_literal(KB, NegLiteral, KBNew), 
     davis_putnam(KBNew, S).
 
 /* Prints the solution of the Davis-Putnam as {a/true;b/false...}*/
