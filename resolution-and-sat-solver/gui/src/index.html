@@ -38,7 +38,12 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        width: 400px;
     }
+
+   .form-inner {width: 100%;}
+    
+    #question { font-weight: 300; } 
 
     .form-group { 
         margin-bottom: 15px; 
@@ -66,6 +71,7 @@
     <h3 class="sub-title">RED DEVILS</h3>
     <form id="form">
         <div class="form-inner">
+            <h4>QUESTION: <span id="question"></span></h4>
             <div class="form-group">
                 <label for="player">Player:</label>
                 <select class="form-select" id="player" name="player" required>
@@ -101,7 +107,40 @@
     </form>
 
     <script>
-        document.getElementById('form').addEventListener('submit', function(e) {
+        function formatQuestion() {
+            // get the selected player
+            const playerSelect = document.getElementById("player");
+            const playerText = playerSelect.options[playerSelect.selectedIndex].text;
+
+            // get the selected positions
+            const positionSelect = document.getElementById("position");
+            const positions = Array.from(positionSelect.selectedOptions).map(option => option.text.toLowerCase());
+
+            // get the selected abilities
+            const abilitySelect = document.getElementById("ability");
+            const abilities = Array.from(abilitySelect.selectedOptions).map(option => option.text.toLowerCase());
+
+            // format the output
+            if (playerText !== "Choose a Manchester United player...") {
+                const positionsText = positions.length > 0 ? positions.join(", ") : "...";
+                const abilitiesText = abilities.length > 0 ? abilities.join(", ") : "...";
+                let question = `Can ${playerText} play as ${positionsText}? `;
+                
+                if (abilitiesText !== "...") {
+                    question += `And is him also ${abilitiesText}?`;
+                }
+            
+                document.getElementById("question").textContent = question;
+            } else {
+                document.getElementById("question").textContent = "";
+            }
+        }
+
+        document.getElementById("player").addEventListener("change", formatQuestion);
+        document.getElementById("position").addEventListener("input", formatQuestion);
+        document.getElementById("ability").addEventListener("input", formatQuestion);
+
+        document.getElementById("form").addEventListener("submit", function(e) {
             e.preventDefault();
             
             // extract the player selected

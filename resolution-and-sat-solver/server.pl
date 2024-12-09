@@ -53,7 +53,8 @@ close_connection(InStream, OutStream) :-
 load_manchester_united_kb(KB) :-
     read_file("./inputs/manchester-united.txt", KBUnpacked),
     process_sentences(KBUnpacked, KBParsed),
-    unpack_kb(KBParsed, KB).
+    unpack_kb(KBParsed, KB),
+    write(KB), nl.
 
 process_question(Question, QuestionProcessed) :-
     atom_string(Atom, Question),
