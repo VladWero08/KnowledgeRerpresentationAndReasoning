@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Car price calculator</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Mysuru:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="./style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<style>
+    /* style.css */
+    .sub-title,.title{margin-block-end:0;text-align:center}#question,body{font-weight:300}.degree-curves__info:hover,button{cursor:pointer}.btn-close__degree-curves,.degree-curves__wrapper{position:absolute;z-index:10;display:flex;visibility:hidden}body{background:#f9e5e1;font-family:"Hind Mysuru",sans-serif;max-width:400px;margin:0 auto}.sub-title{margin-block-start:0;color:#d22b2b;letter-spacing:3px}#form{display:flex;flex-direction:column;align-items:center;justify-content:center;width:400px;margin-top:32px}.form-inner{width:100%}.form-group{margin-bottom:15px}button,input,select{width:100%;padding:10px;box-sizing:border-box}button{background-color:#d22b2b;text-transform:uppercase;font-weight:600;color:#fff;border:none}.degree-curves__info{text-decoration:underline}.degree-curves__wrapper{top:50%;left:50%;transform:translate(-50%,-50%);width:98vw;height:98vh;background:rgba(255,255,255,.52);border-radius:16px;box-shadow:0 4px 30px rgba(0,0,0,.1);backdrop-filter:blur(17.2px);-webkit-backdrop-filter:blur(17.2px);border:1px solid rgba(255,255,255,.11);justify-content:center;align-items:center}.degree-curves{display:flex;flex-direction:column;justify-content:center;align-items:center}.btn-close__degree-curves{right:5%;top:5%;align-items:center;justify-content:center;width:25px;height:20px;background:0 0;color:#000;font-weight:600}
+</style>
+
+<body>
+    <h1 class="title">Car price calculator</h1>
+    <h3 class="sub-title">WANT TO SELL YOUR CAR?</h3>
+
+    <h5 class="degree-curves__info">DEGREE CURVES</h5>
+
+    <form id="form">
+        <div class="form-inner">
+            <div class="form-group">
+                <label for="car-age">AGE (0 to 15 years):</label><br>
+                <input type="range" id="car-age" name="car-age" min="0" max="15" value="0">
+                <span id="car-age-value">0</span> years<br><br>
+            </div>
+            
+            <div class="form-group">
+                <label for="mileage">MILEAGE (0 to 200,000 km):</label><br>
+                <input type="range" id="mileage" name="mileage" min="0" max="200000" value="0" step="1000">
+                <span id="mileage-value">0</span> km<br><br>
+            </div>
+            
+            <div class="form-group">
+                <label for="consumption">CONSUMPTION (0 to 15L/100km):</label><br>
+                <input type="range" id="consumption" name="consumption" min="0" max="15" value="0">
+                <span id="consumption-value">0</span>L/100km<br><br>
+            </div>
+            
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+
+    <div class="degree-curves__wrapper">
+        <div class="degree-curves">
+            <h4>AGE</h4>
+            <canvas id="ageOldDegree" width="500" height="250"></canvas>
+            <canvas id="ageMiddleDegree" width="500" height="250"></canvas>
+            <canvas id="ageNewDegree" width="500" height="250"></canvas>
+        </div> 
+        <div class="degree-curves">
+            <h4>MILEAGE</h4>
+            <canvas id="mileageLowDegree" width="500" height="250"></canvas>
+            <canvas id="mileageMediumDegree" width="500" height="250"></canvas>
+            <canvas id="mileageHighDegree" width="500" height="250"></canvas>
+        </div>
+        <div class="degree-curves">
+            <h4>CONSUMPTION</h4>
+            <canvas id="consumptionLowDegree" width="500" height="250"></canvas>
+            <canvas id="consumptionMediumDegree" width="500" height="250"></canvas>
+            <canvas id="consumptionHighDegree" width="500" height="250"></canvas>
+        </div> 
+    </div>
+
+    <button class="btn-close__degree-curves">x</button>
+
+
+    <script>
+        // formats the numbers with dots as thousand separators
+        function formatNumberWithDots(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        // update the value displayed for car age
+        const carAgeSlider = document.getElementById("car-age");
+        const carAgeValue = document.getElementById("car-age-value");
+        carAgeSlider.oninput = function() {
+            carAgeValue.textContent = carAgeSlider.value;
+        }
+
+        // update the value displayed for mileage
+        const mileageSlider = document.getElementById("mileage");
+        const mileageValue = document.getElementById("mileage-value");
+        mileageSlider.oninput = function() {
+            mileageValue.textContent = formatNumberWithDots(mileageSlider.value);
+        }
+
+        // update the value displayed for consumption
+        const consumptionSlider = document.getElementById("consumption");
+        const consumptionValue = document.getElementById("consumption-value");
+        consumptionSlider.oninput = function() {
+            consumptionValue.textContent = consumptionSlider.value;
+        }
+
+        // select the degree curves components
+        const degreeCurves = document.querySelector(".degree-curves__wrapper");
+        const degreeCurvesOpenBtn = document.querySelector(".degree-curves__info");
+        const degreeCurvesCloseBtn = document.querySelector(".btn-close__degree-curves");
+
+        // listener for opening of the degree curves
+        degreeCurvesOpenBtn.addEventListener("click", () => {
+            degreeCurves.style.visibility =  'visible';
+            degreeCurvesCloseBtn.style.visibility = 'visible';
+        });
+
+        // listener for closing of the degree curves
+        degreeCurvesCloseBtn.addEventListener("click", () => {
+            degreeCurves.style.visibility = "hidden";
+            degreeCurvesCloseBtn.style.visibility = "hidden";
+        });
+
+        document.getElementById("form").addEventListener("submit", function(e) {
+            e.preventDefault();
+            
+            // extract the player selected
+            const player = document.getElementById("player").value;
+
+            if (player == "") {
+                alert("Please select a player.");
+                return;
+            }
+
+            // extract the positions
+            let positions = document.getElementById("position");
+            positions = Array.from(positions.selectedOptions).map(option => option.value);
+
+            // extract the abilities
+            let abilities = document.getElementById("ability");
+            abilities = Array.from(abilities.selectedOptions).map(option => option.value);
+
+            if (positions.length === 0 && abilities.length === 0) {
+                alert("Please select at least one position / ability.");
+                return;
+            }
+
+            const formData = {
+                player: player,
+                positions: positions,
+                abilities: abilities 
+            };
+            
+            // call Python method to handle submission
+            window.pywebview.api.submit_form(formData)
+               .then(response => {
+                    response = response.replace(/\n/g, "");
+
+                    if (response == "UNSATISFIABLE") {
+                        alert("YES! Your question is entailed from the knowledge base.");
+                    } else {
+                        alert("NO!... Your question is NOT entailed from the knowledge base.");
+                    }
+
+                    // reset to the default values after finalisation of the request
+                    document.getElementById("player").selectedIndex = 0; 
+                    document.getElementById("position").selectedIndex = -1; 
+                    document.getElementById("ability").selectedIndex = -1; 
+                    // reset the question to default
+                    document.getElementById("question").textContent = "";
+                })   
+               .catch(error => {
+                    alert("Error while resolving your question. Try again.");
+               }) 
+            ;
+        }); 
+        
+        // age.js
+        const xAgeMin=0,xAgeMax=15,baseFunctionName="age";function newAged(e){return e>=0&&e<=2?1:e>2&&e<=5?1-(e-2)/3:e>5&&e<=15?0:null}function middleAged(e){return e>=0&&e<=3?0:e>3&&e<5?.5*e-1.5:e>=5&&e<=8?1:e>8&&e<10?-.5*e+5:e>=10&&e<=15?0:null}function oldAged(e){return e>=0&&e<=7?0:e>7&&e<10?1/3*e-7/3:e>=10&&e<=15?1:null}const xOld=[],yOld=[],xMiddle=[],yMiddle=[],xNew=[],yNew=[];for(let e=0;e<=15;e+=.01)xOld.push(e.toFixed(1)),yOld.push(oldAged(e));for(let e=0;e<=15;e+=.01)xMiddle.push(e.toFixed(1)),yMiddle.push(middleAged(e));for(let e=0;e<=15;e+=.01)xNew.push(e.toFixed(1)),yNew.push(newAged(e));function createAgeChart(e,d,t,l){const n=document.getElementById(t).getContext("2d");new Chart(n,{type:"line",data:{labels:e,datasets:[{label:l,data:d,borderColor:"#a83232",fill:!1,tension:.1}]},options:{scales:{x:{title:{display:!0,text:"age"}},y:{title:{display:!0,text:"probability"},min:0,max:1.2}}}})}window.addEventListener("load",createAgeChart(xOld,yOld,"ageOldDegree","OLD")),window.addEventListener("load",createAgeChart(xMiddle,yMiddle,"ageMiddleDegree","MIDDLE")),window.addEventListener("load",createAgeChart(xNew,yNew,"ageNewDegree","NEW"));
+        // consumption.js
+        const xConsumMin=0,xConsumMax=15;function low_consum(o){return o>=0&&o<=1?1:o>1&&o<=6?-.2*(o-1)+1:o>6&&o<=15?0:null}function medium_consum(o){return o>=0&&o<=4?0:o>4&&o<5?1*(o-4):o>=5&&o<=8?1:o>8&&o<11?-1/3*(o-8)+1:o>=11&&o<=15?0:null}function high_consum(o){return o>=0&&o<=7?0:o>7&&o<12?.2*(o-7):o>=12&&o<=15?1:null}const xConsumLow=[],yConsumLow=[],xConsumMedium=[],yConsumMedium=[],xConsumHigh=[],yConsumHigh=[];for(let o=0;o<=15;o+=.01)xConsumLow.push(o.toFixed(1)),yConsumLow.push(low_consum(o));for(let o=0;o<=15;o+=.01)xConsumMedium.push(o.toFixed(1)),yConsumMedium.push(medium_consum(o));for(let o=0;o<=15;o+=.01)xConsumHigh.push(o.toFixed(1)),yConsumHigh.push(high_consum(o));function createConsumChart(o,n,e,t){const u=document.getElementById(e).getContext("2d");new Chart(u,{type:"line",data:{labels:o,datasets:[{label:t,data:n,borderColor:"#dbb923",fill:!1,tension:.1}]},options:{scales:{x:{title:{display:!0,text:"consumption"}},y:{title:{display:!0,text:"probability"},min:0,max:1.2}}}})}window.addEventListener("load",createConsumChart(xConsumLow,yConsumLow,"consumptionLowDegree","LOW")),window.addEventListener("load",createConsumChart(xConsumMedium,yConsumMedium,"consumptionMediumDegree","MEDIUM")),window.addEventListener("load",createConsumChart(xConsumHigh,yConsumHigh,"consumptionHighDegree","HIGH"));
+        // mileage.js
+        const xMileageMin=0,xMileageMax=2e5,mileageStep=1e3;function low_mileage(e){return e>=0&&e<=5e4?1:e>5e4&&e<=1e5?1-(e-5e4)/5e4:e>1e5&&e<=2e5?0:null}function medium_mileage(e){return e>=0&&e<=7e4?0:e>7e4&&e<=11e4?(e-7e4)/4e4:e>=11e4&&e<=13e4?1:e>13e4&&e<17e4?1-(e-13e4)/4e4:e>=17e4&&e<=2e5?0:null}function high_mileage(e){return e>=0&&e<=15e4?0:e>15e4&&e<19e4?(e-15e4)/4e4:e>=19e4&&e<=2e5?1:null}const xMileageLow=[],yMileageLow=[],xMileageMedium=[],yMileageMedium=[],xMileageHigh=[],yMileageHigh=[];for(let e=0;e<=2e5;e+=1e3)xMileageLow.push(e.toFixed(1)),yMileageLow.push(low_mileage(e));for(let e=0;e<=2e5;e+=1e3)xMileageMedium.push(e.toFixed(1)),yMileageMedium.push(medium_mileage(e));for(let e=0;e<=2e5;e+=1e3)xMileageHigh.push(e.toFixed(1)),yMileageHigh.push(high_mileage(e));function createMileageChart(e,i,a,l){const t=document.getElementById(a).getContext("2d");new Chart(t,{type:"line",data:{labels:e,datasets:[{label:l,data:i,borderColor:"#db8f23",fill:!1,tension:.1}]},options:{scales:{x:{title:{display:!0,text:"mileage"}},y:{title:{display:!0,text:"probability"},min:0,max:1.2}}}})}window.addEventListener("load",createMileageChart(xMileageLow,yMileageLow,"mileageLowDegree","LOW")),window.addEventListener("load",createMileageChart(xMileageMedium,yMileageMedium,"mileageMediumDegree","MEDIUM")),window.addEventListener("load",createMileageChart(xMileageHigh,yMileageHigh,"mileageHighDegree","HIGH"));
+    </script>
+    
+    <!-- <script src="age.js"></script> -->
+    <!-- <script src="consumption.js"></script> -->
+    <!-- <script src="mileage.js"></script>        -->
+</body>
+</html>

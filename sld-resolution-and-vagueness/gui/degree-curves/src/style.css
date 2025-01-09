@@ -1,0 +1,101 @@
+body { 
+    background: #F9E5E1;
+    font-family: "Hind Mysuru", sans-serif;
+    font-weight: 300;
+    max-width: 400px; 
+    margin: 0 auto; 
+}
+
+.title { 
+    text-align: center; 
+    margin-block-end: 0;
+}
+
+.sub-title { 
+    margin-block-start: 0;
+    margin-block-end: 0;
+    text-align: center; 
+    color: #D22B2B; 
+    letter-spacing: 3px;
+}
+
+#form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 400px;
+    margin-top: 32px;
+}
+
+.form-inner {width: 100%;}
+
+#question { font-weight: 300; } 
+
+.form-group { 
+    margin-bottom: 15px; 
+}
+input, select, button { 
+    width: 100%; 
+    padding: 10px; 
+    box-sizing: border-box; 
+}
+button { 
+    background-color: #D22B2B; 
+    text-transform: uppercase;
+    font-weight: 600;
+    color: white; 
+    border: none; 
+    cursor: pointer; 
+}
+
+.degree-curves__info { text-decoration: underline; }
+.degree-curves__info:hover { cursor: pointer; } 
+
+.degree-curves__wrapper {
+    position: absolute;
+    z-index: 10;
+    top: 50%;
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    width: 98vw;
+    height: 98vh;
+
+    background: rgba(255, 255, 255, 0.52);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(17.2px);
+    -webkit-backdrop-filter: blur(17.2px);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    visibility: hidden;
+} 
+
+.degree-curves {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+} 
+
+.btn-close__degree-curves {
+    position: absolute;
+    z-index: 10;
+    right: 5%;
+    top: 5%;
+    
+    /* to be changed to 'flex' when the info button is clicked */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    visibility: hidden;
+    
+    width: 25px;
+    height: 20px;
+    background: none;
+    color: black;
+    font-weight: 600;
+} 

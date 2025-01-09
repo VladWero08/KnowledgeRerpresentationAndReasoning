@@ -7,7 +7,7 @@ make_new_goals(Clause, Goals, Atom, GoalsNew) :-
 is_clause_resolving(Clause, [Goal|Goals], GoalsNew) :-
     member(CAtom, Clause),
     is_opposite(CAtom, Goal),
-    make_new_goals(Clause, Goals, CAtom, GoalsNew), !.
+    make_new_goals(Clause, Goals, CAtom, GoalsNew).
 
 resolution_backward(_, []).
 resolution_backward(KB, Goals) :- 

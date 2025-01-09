@@ -4,7 +4,7 @@ get_positive_atom(Clause, Atom) :- member(Atom, Clause), is_pos(Atom), !.
 get_negative_atoms(Clause, Atoms) :-  
     findall(NAtom, (
 		member(Atom, Clause),
-		isNeg(Atom),
+		is_neg(Atom),
 		neg(Atom, NAtom)
 	), Atoms).
     
