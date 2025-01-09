@@ -3,7 +3,7 @@ const xMileageMin = 0;
 const xMileageMax = 200_000;
 const mileageStep = 1000;
 
-function low_mileage(x) {
+function lowMileage(x) {
     if (x >= 0 && x <= 50_000) {
         return 1;
     } else if (x > 50_000 && x <= 100_000) {
@@ -15,7 +15,7 @@ function low_mileage(x) {
     return null;
 }
 
-function medium_mileage(x) {
+function mediumMileage(x) {
     if (x >= 0 && x <= 70_000) {
         return 0;
     } else if (x > 70_000 && x <= 110_000) {
@@ -32,7 +32,7 @@ function medium_mileage(x) {
 }
 
 
-function high_mileage(x) {
+function highMileage(x) {
     if (x >= 0 && x <= 150_000) {
         return 0;
     } else if (x > 150_000 && x < 190_000) {
@@ -51,17 +51,17 @@ const xMileageHigh = [], yMileageHigh = [];
 
 for (let x = xMileageMin; x <= xMileageMax; x += mileageStep) { 
     xMileageLow.push(x.toFixed(1)); 
-    yMileageLow.push(low_mileage(x)); 
+    yMileageLow.push(lowMileage(x)); 
 }
 
 for (let x = xMileageMin; x <= xMileageMax; x += mileageStep) { 
     xMileageMedium.push(x.toFixed(1)); 
-    yMileageMedium.push(medium_mileage(x)); 
+    yMileageMedium.push(mediumMileage(x)); 
 }
 
 for (let x = xMileageMin; x <= xMileageMax; x += mileageStep) { 
     xMileageHigh.push(x.toFixed(1)); 
-    yMileageHigh.push(high_mileage(x)); 
+    yMileageHigh.push(highMileage(x)); 
 }
 
 function createChart(xValues, yValues, chartName, chartTitle) {

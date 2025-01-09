@@ -1,7 +1,7 @@
 const xConsumMin = 0;
 const xConsumMax = 15;
 
-function low_consum(x) {
+function lowConsum(x) {
     if (x >= 0 && x <= 1) {
         return 1; 
     } else if (x > 1 && x <= 6) {
@@ -13,7 +13,7 @@ function low_consum(x) {
     return null; 
 }
 
-function medium_consum(x) {
+function mediumConsum(x) {
     if (x >= 0 && x <= 4) {
         return 0
     } else if (x > 4 && x < 5) {
@@ -29,7 +29,7 @@ function medium_consum(x) {
     return null;
 }
 
-function high_consum(x) {
+function highConsum(x) {
     if (x >= 0 && x <= 7) {
         return 0;
     } else if (x > 7 && x < 12) {
@@ -47,17 +47,17 @@ const xConsumHigh = [], yConsumHigh = [];
 
 for (let x = xConsumMin; x <= xConsumMax; x += 0.01) { 
     xConsumLow.push(x.toFixed(1)); 
-    yConsumLow.push(low_consum(x)); 
+    yConsumLow.push(lowConsum(x)); 
 }
 
 for (let x = xConsumMin; x <= xConsumMax; x += 0.01) { 
     xConsumMedium.push(x.toFixed(1)); 
-    yConsumMedium.push(medium_consum(x)); 
+    yConsumMedium.push(mediumConsum(x)); 
 }
 
 for (let x = xConsumMin; x <= xConsumMax; x += 0.01) { 
     xConsumHigh.push(x.toFixed(1)); 
-    yConsumHigh.push(high_consum(x)); 
+    yConsumHigh.push(highConsum(x)); 
 }
 
 function createChart(xValues, yValues, chartName, chartTitle) {
