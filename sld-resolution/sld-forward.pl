@@ -1,4 +1,4 @@
-:- ["./utils/utils.pl"].
+:- ["./utils/utils.pl", "./utils/parse.pl", "./utils/read.pl"].
 
 get_positive_atom(Clause, Atom) :- member(Atom, Clause), is_pos(Atom), !.
 get_negative_atoms(Clause, Atoms) :-  
@@ -20,12 +20,12 @@ is_goal_solved([Goal|Goals], Solved) :-
     member(Goal, Solved), is_goal_solved(Goals, Solved).
 
 resolution_forward_helper(_, Goals, Solved) :-
-    is_goal_solved(Goals, Solved), write("YES"), !.
+    is_goal_solved(Goals, Solved), !.
 resolution_forward_helper(KB, Goals, Solved) :-
 	member(Clause, KB), 
     is_clause_eligible(Clause, Solved, SolvedNew),
     eliminate(Clause, KB, KBNew),
     resolution_forward_helper(KBNew, Goals, SolvedNew), !.
-resolution_forward_helper(_, _, _) :- write("NO").
+resolution_forward_helper(_, _, _) :- false.
     
 resolution_forward(KB, Goals) :- resolution_forward_helper(KB, Goals, []).

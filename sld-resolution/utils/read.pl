@@ -1,6 +1,6 @@
 read_file(Filename, Lines) :-
     open(Filename, read, Stream),
-    read_lines(Stream, Lines),
+    read_lines(Stream, Lines), !,
     close(Stream).
 
 line_to_atom(Line, Term) :-
