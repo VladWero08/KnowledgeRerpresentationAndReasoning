@@ -1,4 +1,4 @@
-:- ["./utils/utils.pl"].
+:- ["./utils/read.pl", "./utils/parse.pl", "./utils/utils.pl"].
 
 new_aged(X, Degree) :- X >= 0, X =< 2, Degree is 1.
 new_aged(X, Degree) :- X > 2, X =< 5, Degree is (1 - (X - 2) / 3).
@@ -112,14 +112,7 @@ get_price(KB, Inputs, Price) :-
 	apply_rules(KB, Inputs, Ys),
     get_centroid_price(Ys, Price).
        
-% get_price(
-%     [
-%         [and, [age/old_aged, consumption/high_consum], [price/low_price]], 
-%         [and, [age/new_aged, mileage/high_mileage], [price/low_price]],
-%         [and, [age/old_aged, mileage/low_mileage], [price/medium_price]],
-%         [and, [age/new_aged, consumption/high_consum], [price/medium_price]],
-%         [and, [age/middle_aged, consumption/low_consum], [price/high_price]],
-%         [or, [mileage/low_mileage, consumption/low_consum], [price/high_price]]
-%     ],
-%     [age/3, consumption/5, mileage/100000], R
-% ).
+solve :-
+    read_file("./inputs/car-price.txt", KB),
+    get_price(KB, [age/3, consumption/8, mileage/100000], Price),
+    writeln(Price).

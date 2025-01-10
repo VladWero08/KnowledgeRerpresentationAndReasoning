@@ -8,20 +8,30 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Mysuru:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- <link rel="stylesheet" href="./style.css"> -->
+    <link rel="stylesheet" href="./style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <style>
     /* style.css */
     .sub-title,.title{margin-block-end:0;text-align:center}#question,body{font-weight:300}.degree-curves__info:hover,button{cursor:pointer}.btn-close__degree-curves,.degree-curves__wrapper{position:absolute;z-index:10;display:flex;text-align:center;visibility:hidden}body{background:#f9e5e1;font-family:"Hind Mysuru",sans-serif;max-width:400px;margin:0 auto}.sub-title{margin-block-start:0;color:#d22b2b;letter-spacing:3px}#form{display:flex;flex-direction:column;align-items:center;justify-content:center;width:400px;margin-top:32px}.form-inner{width:100%}.form-group{margin-bottom:15px}button,input,select{width:100%;padding:10px;box-sizing:border-box}button{background-color:#d22b2b;text-transform:uppercase;font-weight:600;color:#fff;border:none}.degree-curves__info{text-decoration:underline}.degree-curves__wrapper{top:50%;left:50%;transform:translate(-50%,-50%);width:98vw;height:98vh;background:rgba(255,255,255,.52);border-radius:16px;box-shadow:0 4px 30px rgba(0,0,0,.1);backdrop-filter:blur(17.2px);-webkit-backdrop-filter:blur(17.2px);border:1px solid rgba(255,255,255,.11);justify-content:center;align-items:center}.degree-curves{display:flex;flex-direction:column;justify-content:center;align-items:center}.btn-close__degree-curves{right:5%;top:5%;align-items:center;justify-content:center;width:25px;height:20px;background:0 0;color:#000;font-weight:600}
+    .degree-curves__interogation { 
+        display: flex;
+        justify-content: space-between;
+    }
+
+    #fuzzy-stop { color: red; text-decoration: underline; }
+    #fuzzy-stop:hover { cursor: pointer; } 
 </style>
 
 <body>
     <h1 class="title">Car price calculator</h1>
     <h3 class="sub-title">WANT TO SELL YOUR CAR?</h3>
 
-    <h5 class="degree-curves__info">DEGREE CURVES</h5>
+    <div class="degree-curves__interogation"> 
+        <h5 class="degree-curves__info">DEGREE CURVES</h5>
+        <h5 id="fuzzy-stop">STOP</h5>
+    </div>
 
     <form id="form">
         <div class="form-inner">
@@ -140,23 +150,40 @@
                 consumption: consumption
             };
         
-            alert(age + " " + mileage + " " + consumption);
-            
             // call Python method to handle submission
             window.pywebview.api.submit_form(formData)
                .then(response => {
                     response = response.replace(/\n/g, "");
+                    response = parseFloat(response);
+                    response = response.toFixed(2);
+
+                    alert("Price of your car: " + response + " thousands $!")
 
                     // reset to the default values after finalisation of the request
                     document.getElementById("age").value = 0; 
                     document.getElementById("consumption").value = 0;
                     document.getElementById("mileage").value = 0; 
+                    carAgeValue.textContent = 0;
+                    consumptionValue.textContent = 0;
+                    mileageValue.textContent = 0;
                 })   
                .catch(error => {
                     alert("Error while resolving your question. Try again.");
                }) 
             ;
         }); 
+
+        document.getElementById("fuzzy-stop").addEventListener("click", () => {
+            // call Python method to stop the server
+            window.pywebview.api.stop()
+               .then(response => {
+                    alert("Prolog server was closed!");
+                })   
+               .catch(error => {
+                    alert("Error while resolving your question. Try again.");
+               }) 
+            ;
+        });
         
         // age.js
         const xAgeMin=0,xAgeMax=15,baseFunctionName="age";function newAged(e){return e>=0&&e<=2?1:e>2&&e<=5?1-(e-2)/3:e>5&&e<=15?0:null}function middleAged(e){return e>=0&&e<=3?0:e>3&&e<5?.5*e-1.5:e>=5&&e<=8?1:e>8&&e<10?-.5*e+5:e>=10&&e<=15?0:null}function oldAged(e){return e>=0&&e<=7?0:e>7&&e<10?1/3*e-7/3:e>=10&&e<=15?1:null}const xOld=[],yOld=[],xMiddle=[],yMiddle=[],xNew=[],yNew=[];for(let e=0;e<=15;e+=.01)xOld.push(e.toFixed(1)),yOld.push(oldAged(e));for(let e=0;e<=15;e+=.01)xMiddle.push(e.toFixed(1)),yMiddle.push(middleAged(e));for(let e=0;e<=15;e+=.01)xNew.push(e.toFixed(1)),yNew.push(newAged(e));function createAgeChart(e,d,t,l){const n=document.getElementById(t).getContext("2d");new Chart(n,{type:"line",data:{labels:e,datasets:[{label:l,data:d,borderColor:"#a83232",fill:!1,tension:.1}]},options:{scales:{x:{title:{display:!0,text:"age"}},y:{title:{display:!0,text:"probability"},min:0,max:1.2}}}})}window.addEventListener("load",createAgeChart(xOld,yOld,"ageOldDegree","OLD")),window.addEventListener("load",createAgeChart(xMiddle,yMiddle,"ageMiddleDegree","MIDDLE")),window.addEventListener("load",createAgeChart(xNew,yNew,"ageNewDegree","NEW"));
