@@ -1,4 +1,3 @@
-// chart.js
 const xMileageMin = 0;
 const xMileageMax = 200_000;
 const mileageStep = 1000;

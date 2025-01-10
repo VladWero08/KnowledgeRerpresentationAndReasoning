@@ -26,9 +26,9 @@
     <form id="form">
         <div class="form-inner">
             <div class="form-group">
-                <label for="car-age">AGE (0 to 15 years):</label><br>
-                <input type="range" id="car-age" name="car-age" min="0" max="15" value="0">
-                <span id="car-age-value">0</span> years<br><br>
+                <label for="age">AGE (0 to 15 years):</label><br>
+                <input type="range" id="age" name="age" min="0" max="15" value="0">
+                <span id="age-value">0</span> years<br><br>
             </div>
             
             <div class="form-group">
@@ -84,8 +84,8 @@
         }
 
         // update the value displayed for car age
-        const carAgeSlider = document.getElementById("car-age");
-        const carAgeValue = document.getElementById("car-age-value");
+        const carAgeSlider = document.getElementById("age");
+        const carAgeValue = document.getElementById("age-value");
         carAgeSlider.oninput = function() {
             carAgeValue.textContent = carAgeSlider.value;
         }
@@ -124,50 +124,33 @@
         document.getElementById("form").addEventListener("submit", function(e) {
             e.preventDefault();
             
-            // extract the player selected
-            const player = document.getElementById("player").value;
+            // extract the age, consumption and mileage
+            const age = document.getElementById("age").value;
+            const mileage = document.getElementById("mileage").value;
+            const consumption = document.getElementById("consumption").value;
 
-            if (player == "") {
-                alert("Please select a player.");
-                return;
-            }
-
-            // extract the positions
-            let positions = document.getElementById("position");
-            positions = Array.from(positions.selectedOptions).map(option => option.value);
-
-            // extract the abilities
-            let abilities = document.getElementById("ability");
-            abilities = Array.from(abilities.selectedOptions).map(option => option.value);
-
-            if (positions.length === 0 && abilities.length === 0) {
-                alert("Please select at least one position / ability.");
+            if (age == 0 && mileage == 0 && consumption == 0) {
+                alert("Please move at least one slider!");
                 return;
             }
 
             const formData = {
-                player: player,
-                positions: positions,
-                abilities: abilities 
+                age: age,
+                mileage: mileage,
+                consumption: consumption
             };
+        
+            alert(age + " " + mileage + " " + consumption);
             
             // call Python method to handle submission
             window.pywebview.api.submit_form(formData)
                .then(response => {
                     response = response.replace(/\n/g, "");
 
-                    if (response == "UNSATISFIABLE") {
-                        alert("YES! Your question is entailed from the knowledge base.");
-                    } else {
-                        alert("NO!... Your question is NOT entailed from the knowledge base.");
-                    }
-
                     // reset to the default values after finalisation of the request
-                    document.getElementById("player").selectedIndex = 0; 
-                    document.getElementById("position").selectedIndex = -1; 
-                    document.getElementById("ability").selectedIndex = -1; 
-                    // reset the question to default
-                    document.getElementById("question").textContent = "";
+                    document.getElementById("age").value = 0; 
+                    document.getElementById("consumption").value = 0;
+                    document.getElementById("mileage").value = 0; 
                 })   
                .catch(error => {
                     alert("Error while resolving your question. Try again.");
@@ -181,11 +164,13 @@
         const xConsumMin=0,xConsumMax=15;function low_consum(o){return o>=0&&o<=1?1:o>1&&o<=6?-.2*(o-1)+1:o>6&&o<=15?0:null}function medium_consum(o){return o>=0&&o<=4?0:o>4&&o<5?1*(o-4):o>=5&&o<=8?1:o>8&&o<11?-1/3*(o-8)+1:o>=11&&o<=15?0:null}function high_consum(o){return o>=0&&o<=7?0:o>7&&o<12?.2*(o-7):o>=12&&o<=15?1:null}const xConsumLow=[],yConsumLow=[],xConsumMedium=[],yConsumMedium=[],xConsumHigh=[],yConsumHigh=[];for(let o=0;o<=15;o+=.01)xConsumLow.push(o.toFixed(1)),yConsumLow.push(low_consum(o));for(let o=0;o<=15;o+=.01)xConsumMedium.push(o.toFixed(1)),yConsumMedium.push(medium_consum(o));for(let o=0;o<=15;o+=.01)xConsumHigh.push(o.toFixed(1)),yConsumHigh.push(high_consum(o));function createConsumChart(o,n,e,t){const u=document.getElementById(e).getContext("2d");new Chart(u,{type:"line",data:{labels:o,datasets:[{label:t,data:n,borderColor:"#dbb923",fill:!1,tension:.1}]},options:{scales:{x:{title:{display:!0,text:"consumption"}},y:{title:{display:!0,text:"probability"},min:0,max:1.2}}}})}window.addEventListener("load",createConsumChart(xConsumLow,yConsumLow,"consumptionLowDegree","LOW")),window.addEventListener("load",createConsumChart(xConsumMedium,yConsumMedium,"consumptionMediumDegree","MEDIUM")),window.addEventListener("load",createConsumChart(xConsumHigh,yConsumHigh,"consumptionHighDegree","HIGH"));
         // mileage.js
         const xMileageMin=0,xMileageMax=2e5,mileageStep=1e3;function low_mileage(e){return e>=0&&e<=5e4?1:e>5e4&&e<=1e5?1-(e-5e4)/5e4:e>1e5&&e<=2e5?0:null}function medium_mileage(e){return e>=0&&e<=7e4?0:e>7e4&&e<=11e4?(e-7e4)/4e4:e>=11e4&&e<=13e4?1:e>13e4&&e<17e4?1-(e-13e4)/4e4:e>=17e4&&e<=2e5?0:null}function high_mileage(e){return e>=0&&e<=15e4?0:e>15e4&&e<19e4?(e-15e4)/4e4:e>=19e4&&e<=2e5?1:null}const xMileageLow=[],yMileageLow=[],xMileageMedium=[],yMileageMedium=[],xMileageHigh=[],yMileageHigh=[];for(let e=0;e<=2e5;e+=1e3)xMileageLow.push(e.toFixed(1)),yMileageLow.push(low_mileage(e));for(let e=0;e<=2e5;e+=1e3)xMileageMedium.push(e.toFixed(1)),yMileageMedium.push(medium_mileage(e));for(let e=0;e<=2e5;e+=1e3)xMileageHigh.push(e.toFixed(1)),yMileageHigh.push(high_mileage(e));function createMileageChart(e,i,a,l){const t=document.getElementById(a).getContext("2d");new Chart(t,{type:"line",data:{labels:e,datasets:[{label:l,data:i,borderColor:"#db8f23",fill:!1,tension:.1}]},options:{scales:{x:{title:{display:!0,text:"mileage"}},y:{title:{display:!0,text:"probability"},min:0,max:1.2}}}})}window.addEventListener("load",createMileageChart(xMileageLow,yMileageLow,"mileageLowDegree","LOW")),window.addEventListener("load",createMileageChart(xMileageMedium,yMileageMedium,"mileageMediumDegree","MEDIUM")),window.addEventListener("load",createMileageChart(xMileageHigh,yMileageHigh,"mileageHighDegree","HIGH"));
+        // price.js
+        const xPriceMin=0,xPriceMax=15;function lowPrice(e){return e>=0&&e<=2?1:e>2&&e<=5?1-(e-2)/3:e>5&&e<=15?0:null}function mediumPrice(e){if(e>=0&&e<=3)return 0;if(e>3&&e<6)return(e-3)/3;if(e>=6&&e<=9)return 1;if(e>9&&e<12)return 1-(e-9)/3;if(e>=12&&e<=15)return 0;return null}function highPrice(e){return e>=0&&e<=8?0:e>8&&e<13?(e-8)/5:e>=13&&e<=15?1:null}const xPriceLow=[],yPriceLow=[],xPriceMedium=[],yPriceMedium=[],xPriceHigh=[],yPriceHigh=[];for(let x=xPriceMin;x<=15;x+=.01)xPriceLow.push(x.toFixed(1)),yPriceLow.push(lowPrice(x));for(let x=xPriceMin;x<=15;x+=.01)xPriceMedium.push(x.toFixed(1)),yPriceMedium.push(mediumPrice(x));for(let x=xPriceMin;x<=15;x+=.01)xPriceHigh.push(x.toFixed(1)),yPriceHigh.push(highPrice(x));function createChart(e,i,r,t){let c=document.getElementById(r).getContext("2d");new Chart(c,{type:"line",data:{labels:e,datasets:[{label:t,data:i,borderColor:"#42f590",fill:!1,tension:.1}]},options:{scales:{x:{title:{display:!0,text:"price"}},y:{title:{display:!0,text:"probability"},min:0,max:1.2}}}})}window.addEventListener("load",createChart(xPriceLow,yPriceLow,"lowPriceDegree","LOW")),window.addEventListener("load",createChart(xPriceMedium,yPriceMedium,"mediumPriceDegree","MEDIUM")),window.addEventListener("load",createChart(xPriceHigh,yPriceHigh,"highPriceDegree","HIGH"));
     </script>
     
     <!-- <script src="age.js"></script> -->
     <!-- <script src="consumption.js"></script> -->
     <!-- <script src="mileage.js"></script>        -->
-     <script src="price.js"></script>
+    <!-- <script src="price.js"></script> -->
 </body>
 </html>

@@ -1,4 +1,3 @@
-// chart.js
 const xPriceMin = 0;
 const xPriceMax = 15;
 

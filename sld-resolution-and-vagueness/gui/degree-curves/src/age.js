@@ -1,7 +1,5 @@
-// chart.js
 const xAgeMin = 0;
 const xAgeMax = 15;
-const baseFunctionName = "age";
 
 function newAged(x) {
     if (x >= 0 && x <= 2) {
@@ -82,7 +80,7 @@ function createChart(xValues, yValues, chartName, chartTitle) {
                 x: {
                     title: {
                         display: true,
-                        text: baseFunctionName
+                        text: 'age'
                     }
                 },
                 y: {

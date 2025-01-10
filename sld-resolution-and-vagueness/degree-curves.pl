@@ -112,3 +112,14 @@ get_price(KB, Inputs, Price) :-
 	apply_rules(KB, Inputs, Ys),
     get_centroid_price(Ys, Price).
        
+% get_price(
+%     [
+%         [and, [age/old_aged, consumption/high_consum], [price/low_price]], 
+%         [and, [age/new_aged, mileage/high_mileage], [price/low_price]],
+%         [and, [age/old_aged, mileage/low_mileage], [price/medium_price]],
+%         [and, [age/new_aged, consumption/high_consum], [price/medium_price]],
+%         [and, [age/middle_aged, consumption/low_consum], [price/high_price]],
+%         [or, [mileage/low_mileage, consumption/low_consum], [price/high_price]]
+%     ],
+%     [age/3, consumption/5, mileage/100000], R
+% ).
