@@ -1,0 +1,1 @@
+['(',n(engine),or,n(heavy),or,plane,')',and,'(',n(engine),or,n(light),or,scooter,')',and,'(',n(car),or,engine,')',and,'(',n(truck),or,engine,')',and,'(',heavy,')',and,'(',truck,')']

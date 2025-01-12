@@ -1,1 +1,0 @@
-['(',n(child),or,n(female),or,girl,')',and,'(',female,')',and,'(',n(toddler),or,child,')',and,'(',toddler,')',and,'(',n(infant),or,child,')',and,'(',n(child),or,n(male),or,boy,')']

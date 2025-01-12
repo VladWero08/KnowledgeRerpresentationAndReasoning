@@ -42,6 +42,14 @@ close_connection(InStream, OutStream) :-
     write("Client disconnected."), nl.
 
 load_kb(KB) :-
+    % If it has engine and it is heavy, then it is a plane.
+    % If it has engine and it is light, then it is a scooter.
+    % If a car is in stock, then an engine is in stock.
+    % If a truch is in stock, then an engine is in stock.
+    % Heavy vehicles are in stock.
+    % Trucks are in stock.
+    %
+    % Q: Is there a plane in stock?
     read_file("./inputs/kb.txt", KBUnpacked),
     process_sentences(KBUnpacked, KBParsed),
     unpack_kb(KBParsed, KB),
