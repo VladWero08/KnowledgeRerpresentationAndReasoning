@@ -1,0 +1,1 @@
+['(',n(intelligent),or,n(big),or,protective,')',and,'(',n(protective),or,n(trainable),or,germanShepherd,')',and,'(',n(big),or,n(playful),or,rottweiler,')',and,'(',n(small),or,n(playful),or,beagle,')']
