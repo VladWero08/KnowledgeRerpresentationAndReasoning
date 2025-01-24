@@ -25,20 +25,26 @@ handle_client(Socket, KB) :-
         close_connection(InStream, OutStream)
     ).
 
-communicate_with_client(InStream, OutStream, KB) :-
-    read_line_to_string(InStream, Answers),
-    (   Answers == end_of_file
-    ->  true 
-    ;   
-        write("Processing the answers from the client..."), nl,
-        process_answers(Answers, AnswersProcessed),
-        merge(KB, AnswersProcessed, KBComplete),
-        write("Started searching for the right dog..."), nl,
-        dogs(Dogs),
-        recommend_dogs(KBComplete, Dogs, DogsRecommended),
-        format(OutStream, '~w~n', [DogsRecommended]),
-        flush_output(OutStream)
-    ).
+    communicate_with_client(InStream, OutStream, KB) :-
+        read_line_to_string(InStream, Answers),
+        (   Answers == end_of_file
+        ->  true
+        ;   (   Answers == "stop" 
+            ->  write("Stop command received. Shutting down server..."), nl,
+                format(OutStream, "Server shutting down.~n", []),
+                flush_output(OutStream),
+                halt
+            ;   write("Processing the answers from the client..."), nl,
+                process_answers(Answers, AnswersProcessed),
+                merge(KB, AnswersProcessed, KBComplete),
+                write("Started searching for the right dog..."), nl,
+                dogs(Dogs),
+                recommend_dogs(KBComplete, Dogs, DogsRecommended),
+                format(OutStream, '~w~n', [DogsRecommended]),
+                flush_output(OutStream)
+            )
+        ).
+    
 
 close_connection(InStream, OutStream) :-
     close(InStream),
@@ -50,14 +56,7 @@ process_answers(Answers, AnswersParsed) :-
     atom_to_term(Atom, AnswersTerm, _),
     process_sentence(AnswersTerm, AnswersParsed).
 
-
 load_dogs_kb(KB) :-
-    %
-    % If the dog should be intelligent and big, then it is protective.
-    % If the dog should be protective and trainable, recommend German Shepherd.
-    % If the dog should be big and playful, recommend Rottweiler.
-    % If the dog should be small and playful, recommend Beagle.
-    %
     read_file("./inputs/dogs.txt", KBUnpacked),
     process_sentences(KBUnpacked, KBParsed),
     unpack_kb(KBParsed, KB).

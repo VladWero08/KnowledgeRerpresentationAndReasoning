@@ -1,6 +1,5 @@
 :- ["./utils/utils.pl", "./utils/parse.pl", "./utils/read.pl"].
 
-get_positive_atom(Clause, Atom) :- member(Atom, Clause), is_pos(Atom), !.
 get_negative_atoms(Clause, Atoms) :-  
     findall(NAtom, (
 		member(Atom, Clause),

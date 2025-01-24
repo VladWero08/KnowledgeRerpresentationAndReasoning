@@ -1,7 +1,5 @@
 :- ["./utils/utils.pl"].
 
-get_positive_atom(Clause, Atom) :- member(Atom, Clause), is_pos(Atom), !.
-
 make_new_goals(Clause, Goals, PAtom, NAtom, GoalsNew) :-
     eliminate(PAtom, Clause, ClauseUpdated),
     eliminate(NAtom, Goals, GoalsUpdated),

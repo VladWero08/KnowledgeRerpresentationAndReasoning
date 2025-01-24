@@ -175,7 +175,7 @@
 
         document.getElementById("fuzzy-stop").addEventListener("click", () => {
             // call Python method to stop the server
-            window.pywebview.api.stop()
+            window.pywebview.api.stop_server()
                .then(response => {
                     alert("Prolog server was closed!");
                 })   

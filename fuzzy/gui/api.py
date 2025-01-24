@@ -10,28 +10,27 @@ class API:
         with open(html_path, "r") as f:
             self.html = f.read()
 
-    def stop(self):
+    def stop_server(self):
         """
         Stops the prolog server.
         """
-        __stop = "STOP"
-        __stop = __stop.encode("utf-8")
         prolog = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        message = "stop\n".encode("utf-8")
 
         try:
             # connect to the prolog server
             prolog.connect(("localhost", 5000))
-            # send the premises 
-            prolog.sendall(__stop)
+            # send the clause that needs to be interogated
+            prolog.sendall(message)
             # wait for the response from the server
             response = prolog.recv(1024).decode("utf-8")
+
+            return response
         except Exception as e:
-            print("Error while sending the premises to the Prolog server:", e)
+            print("Error while sending the clause to the Prolog server:", e)
         finally:
             # close the connection to the server
             prolog.close()
-
-        return response
         
 
     def submit_form(self, data: dict):

@@ -1,8 +1,6 @@
 :- ["./utils/read.pl", "./utils/parse.pl", "./utils/utils.pl", "./degree-curves.pl"].
 :- use_module(library(socket)).
 
-% :- dynamic stop_server/0.
-
 start_server :-
     tcp_socket(Socket),
     tcp_bind(Socket, 5000),
@@ -13,14 +11,10 @@ start_server :-
     accept_connections(Socket, KB).
 
 accept_connections(Socket, KB) :-
-    % \+ stop_server, 
     tcp_accept(Socket, ClientSocket, _),
     write("Client connected!"), nl,
     handle_client(ClientSocket, KB),
     accept_connections(Socket, KB).
-% accept_connections(Socket, KB) :-
-    % stop_server, 
-    % write("Server stopped."), nl.
 
 handle_client(Socket, KB) :-
     setup_call_cleanup(
@@ -31,15 +25,21 @@ handle_client(Socket, KB) :-
 
 communicate_with_client(InStream, OutStream, KB) :-
     read_line_to_string(InStream, Premises),
-    (   
-        % Premises == "STOP" -> assert(stop_server); 
-        writeln("Processing the question from the client..."),
-        process_question(Premises, PremisesProcessed),
-        writeln("Started computing the price..."), 
-        get_price(KB, PremisesProcessed, Price),
-        writeln("Price computed!"),
-        format(OutStream, '~w~n', [Price]),
-        flush_output(OutStream)
+    (   Premises == end_of_file
+    -> true
+    ;   ( Premises == "stop"
+        ->  write("Stop command received. Shutting down server..."), nl,
+            format(OutStream, "Server shutting down.~n", []),
+            flush_output(OutStream),
+            halt
+        ;   writeln("Processing the question from the client..."),
+            process_question(Premises, PremisesProcessed),
+            writeln("Started computing the price..."), 
+            get_price(KB, PremisesProcessed, Price),
+            writeln("Price computed!"),
+            format(OutStream, '~w~n', [Price]),
+            flush_output(OutStream)
+        )
     ).
 
 close_connection(InStream, OutStream) :-
