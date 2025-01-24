@@ -19,13 +19,14 @@ is_goal_solved([], _).
 is_goal_solved([Goal|Goals], Solved) :-
     member(Goal, Solved), is_goal_solved(Goals, Solved).
 
-resolution_forward_helper(_, Goals, Solved) :-
+resolution_forward_helper(_, Goals, Solved, "YES") :-
     is_goal_solved(Goals, Solved), !.
-resolution_forward_helper(KB, Goals, Solved) :-
+resolution_forward_helper(KB, Goals, Solved, Result) :-
 	member(Clause, KB), 
     is_clause_eligible(Clause, Solved, SolvedNew),
     eliminate(Clause, KB, KBNew),
-    resolution_forward_helper(KBNew, Goals, SolvedNew), !.
-resolution_forward_helper(_, _, _) :- false.
+    resolution_forward_helper(KBNew, Goals, SolvedNew, Result), !.
+resolution_forward_helper(_, _, _, "NO").
     
-resolution_forward(KB, Goals) :- resolution_forward_helper(KB, Goals, []).
+resolution_forward(KB, Goals, Result) :- 
+    resolution_forward_helper(KB, Goals, [], Result).

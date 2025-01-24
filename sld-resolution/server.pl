@@ -1,11 +1,13 @@
 :- ["./utils/read.pl", "./utils/parse.pl", "./utils/utils.pl", "./sld-backward.pl", "./sld-forward.pl"].
 :- use_module(library(socket)).
 
+dogs([germanShepherd, rottweiler, beagle]).
+
 start_server :-
     tcp_socket(Socket),
     tcp_bind(Socket, 5000),
     tcp_listen(Socket, 1), 
-    load_kb(KB),    
+    load_dogs_kb(KB),
     write("Server started on localhost:5000."), nl,
     write("Waiting for connections..."), nl,
     accept_connections(Socket, KB).
@@ -24,15 +26,17 @@ handle_client(Socket, KB) :-
     ).
 
 communicate_with_client(InStream, OutStream, KB) :-
-    read_line_to_string(InStream, Question),
-    (   Question == end_of_file
+    read_line_to_string(InStream, Answers),
+    (   Answers == end_of_file
     ->  true 
     ;   
-        write("Processing the question from the client..."), nl,
-        process_question(Question, QuestionProcessed),
-        write("Started solving the question..."), nl,
-        solve_question(QuestionProcessed, KB, Result),
-        format(OutStream, '~w~n', [Result]),
+        write("Processing the answers from the client..."), nl,
+        process_answers(Answers, AnswersProcessed),
+        merge(KB, AnswersProcessed, KBComplete),
+        write("Started searching for the right dog..."), nl,
+        dogs(Dogs),
+        recommend_dogs(KBComplete, Dogs, DogsRecommended),
+        format(OutStream, '~w~n', [DogsRecommended]),
         flush_output(OutStream)
     ).
 
@@ -41,29 +45,26 @@ close_connection(InStream, OutStream) :-
     close(OutStream),
     write("Client disconnected."), nl.
 
-load_kb(KB) :-
-    % If it has engine and it is heavy, then it is a plane.
-    % If it has engine and it is light, then it is a scooter.
-    % If a car is in stock, then an engine is in stock.
-    % If a truch is in stock, then an engine is in stock.
-    % Heavy vehicles are in stock.
-    % Trucks are in stock.
+process_answers(Answers, AnswersParsed) :-
+    atom_string(Atom, Answers),
+    atom_to_term(Atom, AnswersTerm, _),
+    process_sentence(AnswersTerm, AnswersParsed).
+
+
+load_dogs_kb(KB) :-
     %
-    % Q: Is there a plane in stock?
-    read_file("./inputs/kb.txt", KBUnpacked),
+    % If the dog should be intelligent and big, then it is protective.
+    % If the dog should be protective and trainable, recommend German Shepherd.
+    % If the dog should be big and playful, recommend Rottweiler.
+    % If the dog should be small and playful, recommend Beagle.
+    %
+    read_file("./inputs/dogs.txt", KBUnpacked),
     process_sentences(KBUnpacked, KBParsed),
-    unpack_kb(KBParsed, KB),
-    write(KB), nl.
+    unpack_kb(KBParsed, KB).
 
-process_question(Question, QuestionProcessed) :-
-    atom_string(Atom, Question),
-    atom_to_term(Atom, QuestionTerm, _),
-    process_sentence(QuestionTerm, QuestionParsed),
-    unpack_kb(QuestionParsed, QuestionProcessed).
-
-solve_question(Question, KB, Result) :-
-    copy_term(KB, KBCopy),
-    append([Question], KBCopy, KBQuestion),
-    resolution(KBQuestion, Result).
+recommend_dogs(_, [], []).
+recommend_dogs(KB, [Dog|Dogs], [Result|Results]) :-
+    recommend_dogs(KB, Dogs, Results),
+    resolution_backward(KB, [Dog], Result).
 
 :- initialization(start_server).

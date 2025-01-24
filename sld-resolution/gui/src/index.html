@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Do you own a German Sheperd</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Mysuru:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<style>
+    .sub-title,.title{margin-block-end:0;text-align:center}.sub-title,button{text-transform:uppercase}button,button:hover{background-color:#d22b2b}body{background:#f9e5e1;font-family:"Hind Mysuru",sans-serif;font-weight:300;max-width:400px;margin:0 auto}.sub-title{margin-block-start:0;color:#d22b2b;letter-spacing:3px}#form{display:flex;flex-direction:column;}.form-group{margin-bottom:15px}button,input,select{width:100%;padding:10px;box-sizing:border-box}button{font-weight:600;color:#fff;border:none;cursor:pointer}
+</style>
+
+<body>
+    <h1 class="title">What dog fits you?</h1>
+    <br>
+    <form id="form">
+        <div class="form-inner">
+            <div class="form-group">
+                <label for="weight">Weight (0 to 35 kg):</label><br>
+                <input type="range" id="weight" name="weight" min="0" max="35" value="0">
+                <span id="weight-value">0</span> KGs
+            </div>
+
+            <div class="form-group">
+                <label for="intelligent">Intelligent:</label>
+                <select class="form-select" id="intelligent" name="intelligent">
+                    <option value="choose">Choose</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="playful">Playful:</label>
+                <select class="form-select" id="playful" name="playful">
+                    <option value="choose">Choose</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="trainable">Trainable:</label>
+                <select class="form-select" id="trainable" name="trainable">
+                    <option value="choose">Choose</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+
+    <script>
+        const weightSlider = document.getElementById("weight");
+        const weightValue = document.getElementById("weight-value");
+        weightSlider.oninput = () => {
+            weightValue.textContent = weightSlider.value;
+        }
+
+        document.getElementById("form").addEventListener("submit", function(e) {
+            e.preventDefault();
+            
+            // extract the answers of the user
+            const weight = document.getElementById("weight").value;
+            const intelligent = document.getElementById("intelligent").value;
+            const playful = document.getElementById("playful").value;
+            const trainable = document.getElementById("trainable").value;
+
+            if (weight == 0 || intelligent == "choose" || playful == "choose" || trainable == "choose") {
+                alert("Please complete all questions!");
+                return;
+            }
+
+            const formData = {
+                weight: weight,
+                intelligent: intelligent,
+                playful: playful,
+                trainable: trainable
+            };
+            
+            // call Python method to handle submission
+            window.pywebview.api.submit_form(formData)
+               .then(response => {
+                    alert(response);
+                    
+                    // reset to the default values after finalisation of the request
+                    document.getElementById("weight").value = 0; 
+                    document.getElementById("intelligent").selectedIndex = 0; 
+                    document.getElementById("playful").selectedIndex = 0; 
+                    document.getElementById("trainable").selectedIndex = 0; 
+                    weightValue.textContent = 0;
+                })   
+               .catch(error => {
+                    alert("Error while resolving your question. Try again.");
+               }) 
+            ;
+        });
+    </script>
+</body>
+</html>
