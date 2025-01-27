@@ -1,4 +1,4 @@
-:- ["./utils/read.pl", "./utils/parse.pl", "./utils/utils.pl", "./degree-curves.pl"].
+:- ["./utils/read.pl", "./utils/parse.pl", "./utils/utils.pl", "./fuzzy-logic.pl"].
 :- use_module(library(socket)).
 
 start_server :-
@@ -24,18 +24,18 @@ handle_client(Socket, KB) :-
     ).
 
 communicate_with_client(InStream, OutStream, KB) :-
-    read_line_to_string(InStream, Premises),
-    (   Premises == end_of_file
+    read_line_to_string(InStream, Answers),
+    (   Answers == end_of_file
     -> true
-    ;   ( Premises == "stop"
+    ;   ( Answers == "stop"
         ->  write("Stop command received. Shutting down server..."), nl,
             format(OutStream, "Server shutting down.~n", []),
             flush_output(OutStream),
             halt
         ;   writeln("Processing the question from the client..."),
-            process_question(Premises, PremisesProcessed),
+            process_answers(Answers, AnswersProcessed),
             writeln("Started computing the price..."), 
-            get_price(KB, PremisesProcessed, Price),
+            get_price(KB, AnswersProcessed, Price),
             writeln("Price computed!"),
             format(OutStream, '~w~n', [Price]),
             flush_output(OutStream)
@@ -47,8 +47,8 @@ close_connection(InStream, OutStream) :-
     close(OutStream),
     write("Client disconnected."), nl.
 
-process_question(Premises, PremisesProcessed) :-
-    atom_string(Atom, Premises),
-    atom_to_term(Atom, PremisesProcessed, _).
+process_answers(Answers, AnswersProcessed) :-
+    atom_string(Atom, Answers),
+    atom_to_term(Atom, AnswersProcessed, _).
 
 :- initialization(start_server).
