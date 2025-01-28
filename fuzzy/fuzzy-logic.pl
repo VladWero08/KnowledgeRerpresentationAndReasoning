@@ -7,14 +7,14 @@ apply_predicates([Attribute/Predicate | Predicates], AttributeValues, [Degree | 
     apply_predicates(Predicates, AttributeValues, Degrees).
 
 apply_conjuction([], 1).
-apply_conjuction([Probability | Probabilities], R) :- 
-    apply_conjuction(Probabilities, RRecursive),
-    min(Probability, RRecursive, R).
+apply_conjuction([Degree | Degrees], MinDegree) :- 
+    apply_conjuction(Degrees, MinDegreeRecursive),
+    min(Degree, MinDegreeRecursive, MinDegree).
 
 apply_disjunction([], 0).
-apply_disjunction([Probability | Probabilities], R) :-
-    apply_disjunction(Probabilities, RRecursive),
-    max(Probability, RRecursive, R).
+apply_disjunction([Degree | Degrees], MaxDegree) :-
+    apply_disjunction(Degrees, MaxDegreeRecursive),
+    max(Degree, MaxDegreeRecursive, MaxDegree).
 
 apply_premises(Operator, Premises, Inputs, Result) :-
     Operator = and,
@@ -25,22 +25,22 @@ apply_premises(Operator, Premises, Inputs, Result) :-
     apply_predicates(Premises, Inputs, Degrees),
     apply_disjunction(Degrees, Result).
 
-apply_min_premises([], _, []).
-apply_min_premises([Premise|Premises], Consequence, [Min|Mins]) :-
+apply_min_premises_conseq([], _, []).
+apply_min_premises_conseq([Premise|Premises], Consequence, [Min|Mins]) :-
     min(Premise, Consequence, Min),
-    apply_min_premises(Premises, Consequence, Mins).
+    apply_min_premises_conseq(Premises, Consequence, Mins).
 
 apply_rules([], _, []).
 apply_rules([[Operator, Premises, [_/Consequence]]|KB], Inputs, Result) :-
     apply_premises(Operator, Premises, Inputs, ResultPremises),
     findall(
-        ResultConsequence,
-        (between(0, 15, X), call(Consequence, X, ResultConsequence)), 
-        ResultsConsequence
+        Y,
+        (between(0, 15, X), call(Consequence, X, Y)), 
+        ResultConsequence
     ),
-    apply_min_premises(ResultsConsequence, ResultPremises, ResultCurr),
-    apply_rules(KB, Inputs, ResultRecurr),
-	max_between_lists(ResultCurr, ResultRecurr, Result).
+    apply_min_premises_conseq(ResultConsequence, ResultPremises, ResultRule),
+    apply_rules(KB, Inputs, ResultRuleRecursive),
+	max_between_lists(ResultRule, ResultRuleRecursive, Result).
 
 get_centroid_price(Ys, Price) :-
 	interval(0, 15, Xs),
