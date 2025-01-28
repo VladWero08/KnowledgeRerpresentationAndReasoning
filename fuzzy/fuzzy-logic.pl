@@ -48,11 +48,11 @@ get_centroid_price(Ys, Price) :-
     sum_between_lists_product(Xs, Ys, XYSum),
     Price is XYSum / YSum.
 
-get_price(KB, Inputs, Price) :-
+get_price(KB, Inputs, Ys, Price) :-
 	apply_rules(KB, Inputs, Ys),
     get_centroid_price(Ys, Price).
        
 solve :-
     read_file("./inputs/car-price.txt", KB),
-    get_price(KB, [age/3, consumption/8, mileage/100000], Price),
+    get_price(KB, [age/3, consumption/8, mileage/100000], _, Price),
     writeln(Price).

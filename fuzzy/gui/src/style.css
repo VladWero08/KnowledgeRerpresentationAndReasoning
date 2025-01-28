@@ -49,6 +49,14 @@ button {
     cursor: pointer; 
 }
 
+.degree-curves__interogation { 
+    display: flex;
+    justify-content: space-between;
+}
+
+#fuzzy-stop { color: red; text-decoration: underline; }
+#fuzzy-stop:hover { cursor: pointer; } 
+
 .degree-curves__info { text-decoration: underline; }
 .degree-curves__info:hover { cursor: pointer; } 
 

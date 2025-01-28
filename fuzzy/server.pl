@@ -35,9 +35,11 @@ communicate_with_client(InStream, OutStream, KB) :-
         ;   writeln("Processing the question from the client..."),
             process_answers(Answers, AnswersProcessed),
             writeln("Started computing the price..."), 
-            get_price(KB, AnswersProcessed, Price),
+            get_price(KB, AnswersProcessed, Degrees, Price),
+            writeln(Degrees),
+            writeln(Price),
             writeln("Price computed!"),
-            format(OutStream, '~w~n', [Price]),
+            format(OutStream, '{"degrees": ~w, "price": ~w}', [Degrees, Price]),
             flush_output(OutStream)
         )
     ).

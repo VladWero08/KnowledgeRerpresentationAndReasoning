@@ -1,5 +1,9 @@
 import os
+import io
 import socket
+import json
+import base64
+import matplotlib.pyplot as plt
 
 class API:
     def __init__(self):
@@ -50,13 +54,15 @@ class API:
             prolog.sendall(premises)
             # wait for the response from the server
             response = prolog.recv(1024).decode("utf-8")
+            response = json.loads(response)
         except Exception as e:
             print("Error while sending the premises to the Prolog server:", e)
+            return "ERROR"
         finally:
             # close the connection to the server
             prolog.close()
 
-        return response
+        return json.dumps(response)
     
     def compute_premises(
         self, 

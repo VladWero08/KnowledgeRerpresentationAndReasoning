@@ -14,14 +14,7 @@
 
 <style>
     /* style.css */
-    .sub-title,.title{margin-block-end:0;text-align:center}#question,body{font-weight:300}.degree-curves__info:hover,button{cursor:pointer}.btn-close__degree-curves,.degree-curves__wrapper{position:absolute;z-index:10;display:flex;text-align:center;visibility:hidden}body{background:#f9e5e1;font-family:"Hind Mysuru",sans-serif;max-width:400px;margin:0 auto}.sub-title{margin-block-start:0;color:#d22b2b;letter-spacing:3px}#form{display:flex;flex-direction:column;align-items:center;justify-content:center;width:400px;margin-top:32px}.form-inner{width:100%}.form-group{margin-bottom:15px}button,input,select{width:100%;padding:10px;box-sizing:border-box}button{background-color:#d22b2b;text-transform:uppercase;font-weight:600;color:#fff;border:none}.degree-curves__info{text-decoration:underline}.degree-curves__wrapper{top:50%;left:50%;transform:translate(-50%,-50%);width:98vw;height:98vh;background:rgba(255,255,255,.52);border-radius:16px;box-shadow:0 4px 30px rgba(0,0,0,.1);backdrop-filter:blur(17.2px);-webkit-backdrop-filter:blur(17.2px);border:1px solid rgba(255,255,255,.11);justify-content:center;align-items:center}.degree-curves{display:flex;flex-direction:column;justify-content:center;align-items:center}.btn-close__degree-curves{right:5%;top:5%;align-items:center;justify-content:center;width:25px;height:20px;background:0 0;color:#000;font-weight:600}
-    .degree-curves__interogation { 
-        display: flex;
-        justify-content: space-between;
-    }
-
-    #fuzzy-stop { color: red; text-decoration: underline; }
-    #fuzzy-stop:hover { cursor: pointer; } 
+    .sub-title,.title{margin-block-end:0;text-align:center}#question,body{font-weight:300}#fuzzy-stop,.degree-curves__info{text-decoration:underline}#fuzzy-stop:hover,.degree-curves__info:hover,button{cursor:pointer}.btn-close__degree-curves,.degree-curves__wrapper{position:absolute;z-index:10;display:flex;visibility:hidden}body{background:#f9e5e1;font-family:"Hind Mysuru",sans-serif;max-width:400px;margin:0 auto}.sub-title{margin-block-start:0;color:#d22b2b;letter-spacing:3px}#form{display:flex;flex-direction:column;align-items:center;justify-content:center;width:400px;margin-top:32px}.form-inner{width:100%}.form-group{margin-bottom:15px}button,input,select{width:100%;padding:10px;box-sizing:border-box}button{background-color:#d22b2b;text-transform:uppercase;font-weight:600;color:#fff;border:none}.degree-curves__interogation{display:flex;justify-content:space-between}#fuzzy-stop{color:red}.degree-curves__wrapper{top:50%;left:50%;transform:translate(-50%,-50%);width:98vw;height:98vh;background:rgba(255,255,255,.52);border-radius:16px;box-shadow:0 4px 30px rgba(0,0,0,.1);backdrop-filter:blur(17.2px);-webkit-backdrop-filter:blur(17.2px);border:1px solid rgba(255,255,255,.11);justify-content:center;align-items:center}.degree-curves{display:flex;flex-direction:column;justify-content:center;align-items:center}.btn-close__degree-curves{right:5%;top:5%;align-items:center;justify-content:center;width:25px;height:20px;background:0 0;color:#000;font-weight:600}
 </style>
 
 <body>
@@ -32,7 +25,6 @@
         <h5 class="degree-curves__info">DEGREE CURVES</h5>
         <h5 id="fuzzy-stop">STOP</h5>
     </div>
-
     <form id="form">
         <div class="form-inner">
             <div class="form-group">
@@ -56,6 +48,14 @@
             <button type="submit">Submit</button>
         </div>
     </form>
+
+    <br>
+
+    <canvas 
+        id="priceDegreeCurves" 
+        width="10" 
+        height="10">
+    </canvas>
 
     <div class="degree-curves__wrapper">
         <div class="degree-curves">
@@ -88,6 +88,14 @@
 
 
     <script>
+        // create a default chart
+        createChart(
+            [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], 
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+            "priceDegreeCurves", 
+            "Price degrees based on answers"
+        );
+
         // formats the numbers with dots as thousand separators
         function formatNumberWithDots(num) {
             return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -153,11 +161,19 @@
             // call Python method to handle submission
             window.pywebview.api.submit_form(formData)
                .then(response => {
-                    response = response.replace(/\n/g, "");
-                    response = parseFloat(response);
-                    response = response.toFixed(2);
+                    response = JSON.parse(response);
+                    
+                    let price = parseFloat(response.price).toFixed(2);
+                    let priceDegrees = response.degrees;
+                    let priceXValues = Array.from({ length: 16 }, (_, index) => index);
 
-                    alert("Price of your car: " + response + " thousands $!")
+                    alert("Price of your car: " + price + " thousands $!");
+
+                    const priceDegreeCurveCtx = document.getElementById("priceDegreeCurves").getContext("2d");
+                    if (priceDegreeCurveCtx.chart) {
+                        priceDegreeCurveCtx.chart.destroy();
+                    }
+                    createChart(priceXValues, priceDegrees, "priceDegreeCurves", "Price degrees based on answers");
 
                     // reset to the default values after finalisation of the request
                     document.getElementById("age").value = 0; 
@@ -192,7 +208,7 @@
         // mileage.js
         const xMileageMin=0,xMileageMax=2e5,mileageStep=1e3;function low_mileage(e){return e>=0&&e<=5e4?1:e>5e4&&e<=1e5?1-(e-5e4)/5e4:e>1e5&&e<=2e5?0:null}function medium_mileage(e){return e>=0&&e<=7e4?0:e>7e4&&e<=11e4?(e-7e4)/4e4:e>=11e4&&e<=13e4?1:e>13e4&&e<17e4?1-(e-13e4)/4e4:e>=17e4&&e<=2e5?0:null}function high_mileage(e){return e>=0&&e<=15e4?0:e>15e4&&e<19e4?(e-15e4)/4e4:e>=19e4&&e<=2e5?1:null}const xMileageLow=[],yMileageLow=[],xMileageMedium=[],yMileageMedium=[],xMileageHigh=[],yMileageHigh=[];for(let e=0;e<=2e5;e+=1e3)xMileageLow.push(e.toFixed(1)),yMileageLow.push(low_mileage(e));for(let e=0;e<=2e5;e+=1e3)xMileageMedium.push(e.toFixed(1)),yMileageMedium.push(medium_mileage(e));for(let e=0;e<=2e5;e+=1e3)xMileageHigh.push(e.toFixed(1)),yMileageHigh.push(high_mileage(e));function createMileageChart(e,i,a,l){const t=document.getElementById(a).getContext("2d");new Chart(t,{type:"line",data:{labels:e,datasets:[{label:l,data:i,borderColor:"#db8f23",fill:!1,tension:.1}]},options:{scales:{x:{title:{display:!0,text:"mileage"}},y:{title:{display:!0,text:"probability"},min:0,max:1.2}}}})}window.addEventListener("load",createMileageChart(xMileageLow,yMileageLow,"mileageLowDegree","LOW")),window.addEventListener("load",createMileageChart(xMileageMedium,yMileageMedium,"mileageMediumDegree","MEDIUM")),window.addEventListener("load",createMileageChart(xMileageHigh,yMileageHigh,"mileageHighDegree","HIGH"));
         // price.js
-        const xPriceMin=0,xPriceMax=15;function lowPrice(e){return e>=0&&e<=2?1:e>2&&e<=5?1-(e-2)/3:e>5&&e<=15?0:null}function mediumPrice(e){if(e>=0&&e<=3)return 0;if(e>3&&e<6)return(e-3)/3;if(e>=6&&e<=9)return 1;if(e>9&&e<12)return 1-(e-9)/3;if(e>=12&&e<=15)return 0;return null}function highPrice(e){return e>=0&&e<=8?0:e>8&&e<13?(e-8)/5:e>=13&&e<=15?1:null}const xPriceLow=[],yPriceLow=[],xPriceMedium=[],yPriceMedium=[],xPriceHigh=[],yPriceHigh=[];for(let x=xPriceMin;x<=15;x+=.01)xPriceLow.push(x.toFixed(1)),yPriceLow.push(lowPrice(x));for(let x=xPriceMin;x<=15;x+=.01)xPriceMedium.push(x.toFixed(1)),yPriceMedium.push(mediumPrice(x));for(let x=xPriceMin;x<=15;x+=.01)xPriceHigh.push(x.toFixed(1)),yPriceHigh.push(highPrice(x));function createChart(e,i,r,t){let c=document.getElementById(r).getContext("2d");new Chart(c,{type:"line",data:{labels:e,datasets:[{label:t,data:i,borderColor:"#42f590",fill:!1,tension:.1}]},options:{scales:{x:{title:{display:!0,text:"price"}},y:{title:{display:!0,text:"probability"},min:0,max:1.2}}}})}window.addEventListener("load",createChart(xPriceLow,yPriceLow,"lowPriceDegree","LOW")),window.addEventListener("load",createChart(xPriceMedium,yPriceMedium,"mediumPriceDegree","MEDIUM")),window.addEventListener("load",createChart(xPriceHigh,yPriceHigh,"highPriceDegree","HIGH"));
+        const xPriceMin=0,xPriceMax=15;function lowPrice(e){return e>=0&&e<=2?1:e>2&&e<=5?1-(e-2)/3:e>5&&e<=15?0:null}function mediumPrice(e){if(e>=0&&e<=3)return 0;if(e>3&&e<6)return(e-3)/3;if(e>=6&&e<=9)return 1;if(e>9&&e<12)return 1-(e-9)/3;if(e>=12&&e<=15)return 0;return null}function highPrice(e){return e>=0&&e<=8?0:e>8&&e<13?(e-8)/5:e>=13&&e<=15?1:null}const xPriceLow=[],yPriceLow=[],xPriceMedium=[],yPriceMedium=[],xPriceHigh=[],yPriceHigh=[];for(let x=xPriceMin;x<=15;x+=.01)xPriceLow.push(x.toFixed(1)),yPriceLow.push(lowPrice(x));for(let x=xPriceMin;x<=15;x+=.01)xPriceMedium.push(x.toFixed(1)),yPriceMedium.push(mediumPrice(x));for(let x=xPriceMin;x<=15;x+=.01)xPriceHigh.push(x.toFixed(1)),yPriceHigh.push(highPrice(x));function createChart(e,i,r,t){let c=document.getElementById(r).getContext("2d");c.chart=new Chart(c,{type:"line",data:{labels:e,datasets:[{label:t,data:i,borderColor:"#42f590",fill:!1,tension:.1}]},options:{scales:{x:{title:{display:!0,text:"price"}},y:{title:{display:!0,text:"probability"},min:0,max:1.2}}}})}window.addEventListener("load",createChart(xPriceLow,yPriceLow,"lowPriceDegree","LOW")),window.addEventListener("load",createChart(xPriceMedium,yPriceMedium,"mediumPriceDegree","MEDIUM")),window.addEventListener("load",createChart(xPriceHigh,yPriceHigh,"highPriceDegree","HIGH"));
     </script>
     
     <!-- <script src="age.js"></script> -->
