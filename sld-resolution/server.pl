@@ -45,7 +45,6 @@ handle_client(Socket, KB) :-
             )
         ).
     
-
 close_connection(InStream, OutStream) :-
     close(InStream),
     close(OutStream),
@@ -64,6 +63,6 @@ load_dogs_kb(KB) :-
 recommend_dogs(_, [], []).
 recommend_dogs(KB, [Dog|Dogs], [Result|Results]) :-
     recommend_dogs(KB, Dogs, Results),
-    resolution_backward(KB, [Dog], Result).
+    resolution_forward(KB, [Dog], Result).
 
 :- initialization(start_server).
